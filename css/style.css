@@ -221,7 +221,7 @@
 
 .page,
 .body {
-  height: 100%;
+  min-height: 100%;
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
 }
@@ -749,6 +749,15 @@ a {
     -webkit-box-pack: center;
         -ms-flex-pack: center;
             justify-content: center;
+  }
+
+  .preview__link {
+    color: var(--blue);
+    border: 1px solid var(--blue);
+  }
+
+  .preview__image-wrapper {
+    max-height: 350px;
   }
 
   .tabs__navigation {
