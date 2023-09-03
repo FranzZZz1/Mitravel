@@ -187,13 +187,13 @@
   /* ---------- COLORS  ---------- */
   --preview-backgroud-webkit: -webkit-linear-gradient(
       45deg,
-      var(--preview-accent-color),
-      var(--preview-additional-color)
+      var(--preview-color),
+      var(--blue)
   );
   --preview-backgroud: linear-gradient(
       45deg,
-      var(--preview-accent-color),
-      var(--preview-additional-color)
+      var(--preview-color),
+      var(--blue)
   );
   --preview-color: var(--white);
   --preview-color-rgb: 212, 212, 216;
@@ -450,6 +450,41 @@ a {
 [class*=-ibg_contain] img {
   -o-object-fit: contain;
      object-fit: contain;
+}
+
+.tabs__navigation {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 5px;
+  margin-bottom: 0.9375rem;
+}
+
+.tabs__title {
+  color: var(--preview-accent-color);
+  padding: 0.625rem 0.9375rem;
+  outline: none;
+  border: 1px solid var(--preview-accent-color);
+  border-width: 0 0 1px 0;
+  background: transparent;
+  text-transform: uppercase;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.tabs__title:hover {
+  background-color: rgba(var(--preview-accent-rgb), 0.2);
+}
+
+.tabs__title._tab-active {
+  background-color: rgba(var(--preview-accent-rgb), 0.2);
 }
 
 /*====================================================================================================*/
@@ -2558,6 +2593,13 @@ button.swiper-pagination-bullet {
 }
 
 @media (max-width: 576px) {
+  .tabs__navigation {
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    margin-bottom: 2.5rem;
+  }
+
   .preview__title {
     text-align: center;
   }

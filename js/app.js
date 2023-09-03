@@ -4505,6 +4505,7 @@
         });
         const scrollWidthCheck = function() {
             const headerElem = document.querySelector(".header");
+            if (!headerElem) return;
             document.documentElement;
             let scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
             const updateScrollbarWidth = () => {
@@ -4518,12 +4519,14 @@
         const mql = window.matchMedia("(any-hover: none)");
         const mqlChange = function() {
             const travelSection = document.querySelector(".travel");
+            if (!travelSection) return;
             if (mql.matches) travelSection.classList.add("travel--mobile"); else travelSection.classList.remove("travel--mobile");
         };
         mqlChange();
         mql.addEventListener("change", mqlChange);
         function videoControl() {
             const slider = document.querySelector(".hero-slider");
+            if (!slider) return;
             const videos = slider.querySelectorAll(".hero-slider__media video");
             videos.forEach((video => {
                 const container = video.closest(".hero-slider__media");
@@ -4764,6 +4767,7 @@
         }
         function addActiveClassToVisibleSVGs() {
             const slider = document.querySelector(".hero-slider");
+            if (!slider) return;
             const svgs = slider.querySelectorAll("svg");
             const observer = new IntersectionObserver((entries => {
                 entries.forEach((entry => {
