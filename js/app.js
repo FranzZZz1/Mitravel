@@ -3853,6 +3853,8 @@
             if (document.querySelector(".preview__slider")) {
                 let isTransitioning = false;
                 let swiperSpeed = 600;
+                const prevButton = document.querySelector(".preview__button-prev");
+                const nextButton = document.querySelector(".preview__button-next");
                 new swiper_core_Swiper(".preview__slider", {
                     modules: [ Navigation, Autoplay ],
                     observer: true,
@@ -3880,20 +3882,18 @@
                     on: {
                         transitionStart: function() {
                             const previewSwiper = this;
-                            document.querySelector(".preview__button-prev").disabled = true;
-                            document.querySelector(".preview__button-next").disabled = true;
+                            prevButton.disabled = true;
+                            nextButton.disabled = true;
                             previewSwiper.autoplay.stop();
                         },
                         transitionEnd: function() {
                             const previewSwiper = this;
-                            document.querySelector(".preview__button-prev").disabled = false;
-                            document.querySelector(".preview__button-next").disabled = false;
+                            prevButton.disabled = false;
+                            nextButton.disabled = false;
                             previewSwiper.autoplay.start();
                         },
                         init: function() {
                             let swiper = this;
-                            let prevButton = document.querySelector(".preview__button-prev");
-                            let nextButton = document.querySelector(".preview__button-next");
                             prevButton.addEventListener("click", (function() {
                                 if (!isTransitioning) if (swiper.isBeginning) swiper.slideTo(swiper.slides.length - 1, swiperSpeed); else swiper.slidePrev();
                             }));
@@ -3913,6 +3913,8 @@
             if (document.querySelector(".hero-slider") && document.querySelector(".controls-slider")) {
                 let isTransitioning = false;
                 const sliderSpeed = 800;
+                const prevButton = document.querySelector(".controls-slider__button-prev");
+                const nextButton = document.querySelector(".controls-slider__button-next");
                 const swiperText = new swiper_core_Swiper(".controls-slider", {
                     modules: [ Navigation, Autoplay, Controller ],
                     observer: true,
@@ -3946,23 +3948,17 @@
                     noSwipingClass: "hero-slider__progress",
                     on: {
                         transitionStart: function() {
-                            const prevButton = document.querySelector(".controls-slider__button-prev");
-                            const nextButton = document.querySelector(".controls-slider__button-next");
                             prevButton.disabled = true;
                             nextButton.disabled = true;
                             this.autoplay.stop();
                         },
                         transitionEnd: function() {
-                            const prevButton = document.querySelector(".controls-slider__button-prev");
-                            const nextButton = document.querySelector(".controls-slider__button-next");
                             prevButton.disabled = false;
                             nextButton.disabled = false;
                             this.autoplay.start();
                         },
                         init: function() {
                             let swiper = this;
-                            let prevButton = document.querySelector(".controls-slider__button-prev");
-                            let nextButton = document.querySelector(".controls-slider__button-next");
                             prevButton.addEventListener("click", (function() {
                                 if (!isTransitioning) if (swiper.isBeginning) swiper.slideTo(swiper.slides.length - 1, sliderSpeed); else swiper.slidePrev();
                             }));
@@ -3977,7 +3973,6 @@
                             }));
                             let timeout;
                             const videoContainers = document.querySelectorAll(".hero-slider__media");
-                            document.querySelectorAll(".hero-slider__progress");
                             const isTouchDevice = "ontouchstart" in window || navigator.msMaxTouchPoints > 0;
                             const applyTimeout = function(speed = 2e3) {
                                 clearTimeout(timeout);
@@ -4018,6 +4013,7 @@
                                     }
                                 }));
                                 video.addEventListener("seeked", (function() {
+                                    if (!video.paused) return;
                                     applyTimeout();
                                 }));
                                 swiper.on("slideChange", (function() {
@@ -4140,9 +4136,6 @@
                 if (!pageLockPadding || !pageLock) return;
                 const classToTrack = pageLockClass;
                 let scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-                const updateScrollbarWidth = () => {
-                    scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-                };
                 const mutationObserver = new MutationObserver(((mutationsList, observer) => {
                     for (const mutation of mutationsList) if (mutation.type === "attributes" && mutation.attributeName === "class") {
                         const currentClass = document.documentElement.className;
@@ -4152,8 +4145,6 @@
                 mutationObserver.observe(document.documentElement, {
                     attributes: true
                 });
-                const resizeObserver = new ResizeObserver(updateScrollbarWidth);
-                resizeObserver.observe(document.documentElement);
             };
             pageLockObserver();
             const headerMenuOpen = function() {
@@ -4216,17 +4207,16 @@
                 if (scrollLock && scrollLockDesktop && event.target.closest(`.${scrollLockClass}`)) event.preventDefault();
             };
             const headerPositionCheck = function() {
-                if (mainElement) {
-                    const headerStyles = window.getComputedStyle(headerElem);
-                    const headerPosition = headerStyles.getPropertyValue("position");
-                    const main = document.querySelector(mainElement);
-                    if (main) if (headerPosition == "absolute" || headerPosition == "fixed") {
-                        main.style.marginTop = `${headerElem.offsetHeight + (mainElementScrollMargin ? mainElementScrollMargin : 0)}px`;
-                        headerElem.style.marginBottom = "";
-                    } else {
-                        headerElem.style.marginBottom = 0 + (mainElementScrollMargin ? mainElementScrollMargin : 0) + "px";
-                        main.style.marginTop = "";
-                    }
+                if (!mainElement) return;
+                const headerStyles = window.getComputedStyle(headerElem);
+                const headerPosition = headerStyles.getPropertyValue("position");
+                const main = document.querySelector(mainElement);
+                if (main) if (headerPosition == "absolute" || headerPosition == "fixed") {
+                    main.style.marginTop = `${headerElem.offsetHeight + (mainElementScrollMargin ? mainElementScrollMargin : 0)}px`;
+                    headerElem.style.marginBottom = "";
+                } else {
+                    headerElem.style.marginBottom = (mainElementScrollMargin ? mainElementScrollMargin : 0) + "px";
+                    main.style.marginTop = "";
                 }
             };
             const headerHide = function() {
@@ -4252,16 +4242,21 @@
                 }
             };
             const headerScrollWatcher = function() {
-                let {headerScrollPosition, headerScrollEndPosition, headerScrollMobile, headerScrollClass} = headerScroll;
-                let scrollPosition = headerScrollPosition !== void 0 && headerScrollPosition !== false ? headerScrollPosition : headerHeight;
-                let scrollEndPosition = headerScrollEndPosition !== void 0 && headerScrollEndPosition !== false ? headerScrollEndPosition : headerScrollEndPosition = scrollPosition > 0 ? scrollPosition - 1 : scrollPosition;
+                if (!headerScroll) return;
+                let {headerScrollPosition = headerHeight, headerScrollEndPosition, headerScrollMobile, headerScrollClass} = headerScroll;
+                const isMobile = headerScrollMobile ? true : !mql.matches;
+                const scrollEndPosition = headerScrollEndPosition !== false ? headerScrollEndPosition : headerScrollEndPosition = headerScrollPosition > 0 ? headerScrollPosition - 1 : headerScrollPosition;
                 const handleScrollWatch = function() {
                     const pos = window.pageYOffset;
-                    const isMobile = headerScrollMobile ? true : !mql.matches;
-                    if (isMobile && pos >= scrollPosition) headerElem.classList.add(headerScrollClass); else if (pos <= scrollEndPosition) headerElem.classList.remove(headerScrollClass);
-                    headerPositionCheck();
+                    if (isMobile && pos >= headerScrollPosition) {
+                        headerElem.classList.add(headerScrollClass);
+                        mainElement && headerPositionCheck();
+                    } else if (pos <= scrollEndPosition) {
+                        headerElem.classList.remove(headerScrollClass);
+                        mainElement && headerPositionCheck();
+                    }
                 };
-                if (scrollPosition >= scrollEndPosition) {
+                if (headerScrollPosition >= scrollEndPosition) {
                     attachEvent(window, "scroll", handleScrollWatch);
                     handleScrollWatch();
                 } else {
@@ -4271,35 +4266,35 @@
                 }
             };
             const scrollWatcher = function() {
-                if (scrollWatch && menuItem) {
-                    const menuItems = headerElem.querySelectorAll(menuItem);
-                    const headerHeightTimes2 = headerHeight * 2;
-                    const handleScroll = function() {
-                        const scrollPosition = window.pageYOffset;
-                        let currentActiveMenuItem = null;
-                        menuItems.forEach((menuItem => {
-                            const targetId = menuLink ? menuItem.querySelector(menuLink).getAttribute("href") : menuItem.querySelector("a").getAttribute("href");
-                            if (!targetId) {
-                                console.error(`${header}:\nОтсутствует тег "a" в menuItem, либо атрибут href.`);
-                                return;
-                            }
-                            const section = document.querySelector(targetId);
-                            if (!section) {
-                                console.error(`${header}:\nОтсутствуют section с id, соответствующим href в menuLink.`);
-                                return;
-                            }
-                            const sectionTop = section.getBoundingClientRect().top + scrollPosition;
-                            const isSectionVisible = sectionTop <= scrollPosition + headerHeightTimes2;
-                            if (isSectionVisible) currentActiveMenuItem = menuItem;
-                        }));
-                        menuItems.forEach((menuItem => {
-                            menuItem.classList.remove(menuItemActive);
-                        }));
-                        if (currentActiveMenuItem) currentActiveMenuItem.classList.add(menuItemActive);
-                    };
-                    attachEvent(window, "scroll", handleScroll);
-                    handleScroll();
-                }
+                if (!scrollWatch || !menuItem) return;
+                const menuItems = headerElem.querySelectorAll(menuItem);
+                const headerHeightTimes2 = headerHeight * 2;
+                const sections = Array.from(menuItems).map((menuItem => {
+                    const targetId = menuLink ? menuItem.querySelector(menuLink).getAttribute("href") : menuItem.querySelector("a").getAttribute("href");
+                    if (!targetId) {
+                        console.error(`${header}:\nОтсутствует тег "a" в menuItem, либо атрибут href.`);
+                        return null;
+                    }
+                    const section = document.querySelector(targetId);
+                    if (!section) {
+                        console.error(`${header}:\nОтсутствуют section с id, соответствующим href в menuLink.`);
+                        return null;
+                    }
+                    return section;
+                })).filter(Boolean);
+                const handleScroll = function() {
+                    const scrollPosition = window.pageYOffset;
+                    let currentActiveMenuItem = null;
+                    sections.forEach(((section, index) => {
+                        const sectionTop = section.getBoundingClientRect().top + scrollPosition;
+                        const isSectionVisible = sectionTop <= scrollPosition + headerHeightTimes2;
+                        if (isSectionVisible) currentActiveMenuItem = menuItems[index];
+                        menuItems[index].classList.remove(menuItemActive);
+                    }));
+                    if (currentActiveMenuItem) currentActiveMenuItem.classList.add(menuItemActive);
+                };
+                attachEvent(window, "scroll", handleScroll);
+                handleScroll();
             };
             let headerHeightEventAdded = false;
             const headerHeightAccounting = function() {
@@ -4326,11 +4321,12 @@
                                 const offsetTop = targetElement.getBoundingClientRect().top;
                                 let scrollOptions = {};
                                 scrollOptions.behavior = shouldSmoothScroll ? "smooth" : "auto";
+                                const isFirstLink = shouldScrollOffsetHeader ? anchorLinks.length > 0 && link == anchorLinks[0] : false;
                                 if (shouldScrollOffsetHeader) {
-                                    if (!dynamic || dynamic && anchorLinks.length > 0 && link == anchorLinks[0]) if (headerPosition == "fixed") if (anchorLinks.length > 0 && link == anchorLinks[0]) scrollOptions.top = offsetTop - headerHeight - mainElementScrollMargin; else scrollOptions.top = offsetTop - headerHeight - scrollMargin; else if (anchorLinks.length > 0 && link == anchorLinks[0]) scrollOptions.top = offsetTop - headerHeight - mainElementScrollMargin; else scrollOptions.top = offsetTop - scrollMargin; else if (dynamic) if (
+                                    if (!dynamic || dynamic && isFirstLink) if (headerPosition == "fixed") if (isFirstLink) scrollOptions.top = offsetTop - headerHeight - mainElementScrollMargin; else scrollOptions.top = offsetTop - headerHeight - scrollMargin; else if (isFirstLink) scrollOptions.top = offsetTop - headerHeight - mainElementScrollMargin; else scrollOptions.top = offsetTop - scrollMargin; else if (dynamic) if (
                                     //! experimental "+ headerHeight"
                                     targetElement.getBoundingClientRect().y < 0 + headerHeight) scrollOptions.top = offsetTop - headerHeight - scrollMargin; else scrollOptions.top = offsetTop - scrollMargin;
-                                } else if (dynamic) if (anchorLinks.length > 0 && link == anchorLinks[0]) scrollOptions.top = offsetTop - headerHeight - mainElementScrollMargin; else scrollOptions.top = offsetTop - scrollMargin; else if (anchorLinks.length > 0 && link == anchorLinks[0]) scrollOptions.top = offsetTop - headerHeight - mainElementScrollMargin; else scrollOptions.top = offsetTop - scrollMargin;
+                                } else if (dynamic) if (isFirstLink) scrollOptions.top = offsetTop - headerHeight - mainElementScrollMargin; else scrollOptions.top = offsetTop - scrollMargin; else if (isFirstLink) scrollOptions.top = offsetTop - headerHeight - mainElementScrollMargin; else scrollOptions.top = offsetTop - scrollMargin;
                                 window.scrollBy(scrollOptions);
                             }
                         }
@@ -4391,25 +4387,22 @@
             const customFunction = function() {
                 if (on && typeof on.customEvent === "function") on.customEvent();
             };
-            const handleScrollChange = function() {
-                headerPositionCheck();
-            };
             const handleMediaQueryChange = function() {
-                headerHide();
+                dynamic && headerHide();
                 headerPositionCheck();
-                headerHeightAccounting();
+                (shouldScrollOffsetHeader || shouldSmoothScroll) && headerHeightAccounting();
                 headerHeightEventAdded = true;
                 headerScroll && headerScrollWatcher();
             };
             allObjectConversions();
             headerScroll && headerScrollWatcher();
-            headerHide();
-            scrollWatcher();
-            headerHeightAccounting();
-            headerPositionCheck();
+            dynamic && headerHide();
+            scrollWatch && scrollWatcher();
+            (shouldScrollOffsetHeader || shouldSmoothScroll) && headerHeightAccounting();
             mqlCheck();
             customFunction();
-            attachEvent(window, "scroll", handleScrollChange);
+            headerPositionCheck();
+            attachEvent(window, "scroll", headerPositionCheck);
             attachEvent(mql, "change", handleMediaQueryChange);
             function attachEvent(element, event, handler, options) {
                 element.addEventListener(event, handler, options);
@@ -4490,41 +4483,33 @@
             menuItem: ".menu__item",
             menuLink: ".menu__link",
             mediaQuery: 9999,
-            shouldScrollOffsetHeader: true,
-            scrollMargin: 0,
             shouldSmoothScroll: true,
-            scrollLock: true,
             headerScroll: {
                 headerScrollPosition: 20,
-                headerScrollMobile: true
+                headerScrollMobile: true,
+                headerScrollClass: "header--hidden"
             },
             pageLock: true,
             pageLockPadding: true,
-            pageLockClass: "lock",
-            headerHeightValue: 90
+            pageLockClass: "lock"
         });
-        const scrollWidthCheck = function() {
-            const headerElem = document.querySelector(".header");
+        const headerElem = document.querySelector(".header");
+        const isTouchDevice = "ontouchstart" in window || navigator.msMaxTouchPoints > 0;
+        const scrollWidthCheck = () => {
+            const windowWidth = window.innerWidth;
+            const rootWidth = document.documentElement.clientWidth;
             if (!headerElem) return;
-            document.documentElement;
-            let scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-            const updateScrollbarWidth = () => {
-                scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-                if (window.innerWidth > window.innerWidth - scrollbarWidth) headerElem.style.paddingRight = `${scrollbarWidth}px`; else if (window.innerWidth <= window.innerWidth - scrollbarWidth) headerElem.style.paddingRight = `0px`;
-            };
-            updateScrollbarWidth();
-            window.addEventListener("resize", updateScrollbarWidth);
+            let scrollbarWidth = windowWidth - rootWidth;
+            if (!isTouchDevice) return headerElem.style.paddingRight = `${scrollbarWidth}px`; else return headerElem.style.paddingRight = `0px`;
         };
         scrollWidthCheck();
-        const mql = window.matchMedia("(any-hover: none)");
-        const mqlChange = function() {
+        const sectionMobileVersion = () => {
             const travelSection = document.querySelector(".travel");
             if (!travelSection) return;
-            if (mql.matches) travelSection.classList.add("travel--mobile"); else travelSection.classList.remove("travel--mobile");
+            if (!isTouchDevice) return travelSection.classList.remove("travel--mobile"); else return travelSection.classList.add("travel--mobile");
         };
-        mqlChange();
-        mql.addEventListener("change", mqlChange);
-        function videoControl() {
+        sectionMobileVersion();
+        const videoControl = () => {
             const slider = document.querySelector(".hero-slider");
             if (!slider) return;
             const videos = slider.querySelectorAll(".hero-slider__media video");
@@ -4540,7 +4525,7 @@
                 let timeout;
                 let isDragging = false;
                 let lastExecutionTime = 0;
-                function updateProgressBar() {
+                const updateProgressBar = () => {
                     const currentTime = video.currentTime;
                     const duration = video.duration;
                     if (!isNaN(currentTime) && !isNaN(duration)) {
@@ -4548,8 +4533,8 @@
                         progressBar.style.width = progress + "%";
                     }
                     requestAnimationFrame(updateProgressBar);
-                }
-                function seekVideo(event) {
+                };
+                const seekVideo = event => {
                     const containerRect = progressContainer.getBoundingClientRect();
                     let clickX;
                     if (event.type === "touchstart" || event.type === "touchmove") {
@@ -4562,40 +4547,40 @@
                     } else clickX = event.clientX - containerRect.left;
                     const containerWidth = containerRect.width;
                     const seekTime = clickX / containerWidth * video.duration;
-                    video.currentTime = seekTime;
-                }
-                function startDrag() {
+                    return video.currentTime = seekTime;
+                };
+                const startDrag = () => {
                     isDragging = true;
                     progressContainer.style.cursor = "grabbing";
-                }
-                function endDrag() {
+                };
+                const endDrag = () => {
                     if (isDragging) isDragging = false;
                     progressContainer.style.cursor = "pointer";
-                }
-                function progressMouseLeave() {
+                };
+                const progressMouseLeave = () => {
                     progressIndicator.style.opacity = 0;
                     endDrag();
-                }
-                function progressMouseEnter() {
+                };
+                const progressMouseEnter = () => {
                     progressIndicator.style.opacity = 1;
-                }
-                function updateProgressIndicator(event) {
+                };
+                const updateProgressIndicator = event => {
                     const containerRect = progressContainer.getBoundingClientRect();
                     const mouseX = event.clientX - containerRect.right;
                     const containerWidth = containerRect.width;
                     const indicatorPosition = mouseX / containerWidth * 100;
-                    progressIndicator.style.left = indicatorPosition + "%";
-                }
-                function progressDragMouseMove(event) {
+                    return progressIndicator.style.left = indicatorPosition + "%";
+                };
+                const progressDragMouseMove = event => {
                     if (isDragging) {
                         seekVideo(event);
                         updateProgressBar();
                         updateTimer();
                     }
-                }
+                };
                 updateProgressBar();
                 const videoTimer = container.querySelector(".hero-slider__timer");
-                function updateTimer() {
+                const updateTimer = () => {
                     const currentTime = video.currentTime;
                     const duration = video.duration;
                     const currentMinutes = Math.floor(currentTime / 60);
@@ -4604,56 +4589,56 @@
                     const durationSeconds = Math.floor(duration % 60);
                     const currentTimeString = `${currentMinutes.toString().padStart(2, "0")}:${currentSeconds.toString().padStart(2, "0")}`;
                     const durationTimeString = `${durationMinutes.toString().padStart(2, "0")}:${durationSeconds.toString().padStart(2, "0")}`;
-                    videoTimer.textContent = `${currentTimeString} / ${durationTimeString}`;
-                }
-                function hideCursor() {
+                    return videoTimer.textContent = `${currentTimeString} / ${durationTimeString}`;
+                };
+                const hideCursor = () => {
                     videoContainer.style.cursor = "none";
                     playBtn.style.cursor = "none";
                     pauseBtn.style.cursor = "none";
-                }
-                function showCursor() {
+                };
+                const showCursor = () => {
                     videoContainer.style.cursor = "pointer";
                     playBtn.style.cursor = "pointer";
                     pauseBtn.style.cursor = "pointer";
-                }
-                function applyTimeout(speed = 2e3, isCursorHidden = true) {
+                };
+                const applyTimeout = (speed = 2e3, isCursorHidden = true) => {
                     clearTimeout(timeout);
                     timeout = setTimeout((() => {
                         videoContainer.classList.remove("hovered");
                         isCursorHidden && hideCursor();
                     }), speed);
-                }
-                function togglePlay() {
+                };
+                const togglePlay = () => {
                     if (video.paused) {
                         showCursor();
                         video.play();
                     } else video.pause();
-                }
-                function handleMouseEnter() {
+                };
+                const handleMouseEnter = () => {
                     videoContainer.classList.add("hovered");
                     applyTimeout(2e3, false);
-                }
-                function handleMouseLeave() {
+                };
+                const handleMouseLeave = () => {
                     applyTimeout(500, false);
-                }
-                function onPlayMouseMove() {
+                };
+                const onPlayMouseMove = () => {
                     videoContainer.classList.add("hovered");
                     showCursor();
                     applyTimeout();
-                }
-                function onPauseMouseMove() {
+                };
+                const onPauseMouseMove = () => {
                     videoContainer.classList.add("hovered");
                     showCursor();
                     applyTimeout(2e3, false);
-                }
-                function toggleFullScreen() {
+                };
+                const toggleFullScreen = () => {
                     if (!video.fullscreenElement) {
                         if (video.requestFullscreen) video.requestFullscreen(); else if (video.mozRequestFullScreen) video.mozRequestFullScreen(); else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
-                    } else if (video.exitFullscreen) video.exitFullscreen(); else if (video.mozCancelFullScreen) video.mozCancelFullScreen(); else if (video.webkitExitFullscreen) video.webkitExitFullscreen();
-                }
-                function handleFullscreenChange() {
+                    } else if (document.exitFullscreen) document.exitFullscreen(); else if (document.mozCancelFullScreen) document.mozCancelFullScreen(); else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                };
+                const handleFullscreenChange = () => {
                     if (!document.fullscreenElement) video.addEventListener("touchend", handleVideoTouch); else video.removeEventListener("touchend", handleVideoTouch);
-                }
+                };
                 document.addEventListener("fullscreenchange", handleFullscreenChange);
                 document.addEventListener("mozfullscreenchange", handleFullscreenChange);
                 document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
@@ -4663,7 +4648,7 @@
                 video.addEventListener("timeupdate", updateTimer);
                 progressContainer.addEventListener("click", seekVideo);
                 fullscreenBtn.addEventListener("click", toggleFullScreen);
-                function onVideoPlay() {
+                const onVideoPlay = () => {
                     container.classList.add("played");
                     playBtn.classList.add("hidden");
                     pauseBtn.classList.remove("hidden");
@@ -4671,8 +4656,8 @@
                     applyTimeout();
                     container.addEventListener("mousemove", onPlayMouseMove);
                     container.removeEventListener("mousemove", onPauseMouseMove);
-                }
-                function onVideoPause() {
+                };
+                const onVideoPause = () => {
                     container.classList.remove("played");
                     playBtn.classList.remove("hidden");
                     pauseBtn.classList.add("hidden");
@@ -4681,7 +4666,7 @@
                     applyTimeout(2e3, false);
                     container.addEventListener("mousemove", onPauseMouseMove);
                     container.removeEventListener("mousemove", onPlayMouseMove);
-                }
+                };
                 container.addEventListener("mousemove", onPauseMouseMove);
                 video.addEventListener("play", onVideoPlay);
                 video.addEventListener("pause", onVideoPause);
@@ -4697,21 +4682,20 @@
                     video.pause();
                 }));
                 let cursorMoved = false;
-                function cursorDidntMoved() {
+                const cursorDidntMoved = () => {
                     cursorMoved = false;
-                }
-                function cursorWasMoved() {
+                };
+                const cursorWasMoved = () => {
                     cursorMoved = true;
-                }
-                function cursorMoveCheck(e) {
+                };
+                const cursorMoveCheck = e => {
                     if (!cursorMoved) togglePlay(); else e.preventDefault();
-                }
-                const isTouchDevice = "ontouchstart" in window || navigator.msMaxTouchPoints > 0;
-                function handleVideoTouch(e) {
+                };
+                const handleVideoTouch = e => {
                     applyTimeout(3e3, false);
                     e.preventDefault();
                     videoContainer.classList.toggle("hovered");
-                }
+                };
                 if (isTouchDevice) {
                     video.addEventListener("touchend", handleVideoTouch);
                     progressContainer.addEventListener("touchstart", startDrag, {
@@ -4747,37 +4731,37 @@
                     progressContainer.removeEventListener("touchend", endDrag);
                 }
             }));
-            function handleKeyDown(event) {
+            const handleKeyDown = event => {
                 if (event.keyCode === 32) {
                     videos.forEach((video => {
                         if (isElementVisible(video.closest(".hero-slider__media"))) video.paused ? video.play() : video.pause();
                     }));
                     event.preventDefault();
                 }
-            }
+            };
             document.addEventListener("keydown", handleKeyDown);
-            function isElementVisible(el) {
+            const isElementVisible = el => {
                 const slider = document.querySelector(".hero-slider");
                 const sliderRect = slider.getBoundingClientRect();
                 const elRect = el.getBoundingClientRect();
                 const isVisibleInSlider = elRect.left >= sliderRect.left && elRect.right <= sliderRect.right && elRect.top >= sliderRect.top && elRect.bottom <= sliderRect.bottom;
                 const isNotHidden = getComputedStyle(el).display !== "none" && getComputedStyle(el).visibility !== "hidden";
                 return isVisibleInSlider && isNotHidden;
-            }
-        }
-        function addActiveClassToVisibleSVGs() {
+            };
+        };
+        const addActiveClassToVisibleSVGs = () => {
             const slider = document.querySelector(".hero-slider");
             if (!slider) return;
             const svgs = slider.querySelectorAll("svg");
             const observer = new IntersectionObserver((entries => {
                 entries.forEach((entry => {
-                    if (entry.isIntersecting) entry.target.classList.add("svg-visible"); else entry.target.classList.remove("svg-visible");
+                    entry.target.classList.toggle("svg-visible", entry.isIntersecting);
                 }));
             }));
             svgs.forEach((svg => {
                 observer.observe(svg);
             }));
-        }
+        };
         document.addEventListener("DOMContentLoaded", (function() {
             videoControl();
             addActiveClassToVisibleSVGs();
