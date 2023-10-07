@@ -3913,8 +3913,8 @@
             if (document.querySelector(".hero-slider") && document.querySelector(".controls-slider")) {
                 let isTransitioning = false;
                 const sliderSpeed = 800;
-                const prevButton = document.querySelector(".controls-slider__button-prev");
-                const nextButton = document.querySelector(".controls-slider__button-next");
+                const prevButton = document.querySelector(".controls__button-prev");
+                const nextButton = document.querySelector(".controls__button-next");
                 const swiperText = new swiper_core_Swiper(".controls-slider", {
                     modules: [ Navigation, Autoplay, Controller ],
                     observer: true,
@@ -4071,7 +4071,7 @@
                 console.error("header selector/tag required");
                 return;
             }
-            let {menuIcon = ".header__burger", menuBody = ".header__menu-wrapper", menuItem = ".header__menu-item", menuLink = ".header__menu-link", shouldMenuOffsetHeader = false, pageLock = false, pageLockClass = "lock", pageLockPadding = false, menu = true, scrollWatch = false, headerScroll = false, dynamic = false, mediaQuery = false, scrollLock = false, shouldScrollOffsetHeader = false, shouldSmoothScroll = true, scrollMargin = 0, mainElement = false, mainElementScrollMargin = 0, menuItemActive = "active", menuOpenClass = "menu--open", hideClass = "visually-hidden", menuIconActive = "header__burger--active", on, speed = 350, animationClass = true, headerHeightValue = false} = options;
+            let {menuIcon = ".header__burger", menuBody = ".header__menu-wrapper", menuItem = ".header__menu-item", menuLink = ".header__menu-link", shouldMenuOffsetHeader = false, pageLock = false, pageLockClass = "lock", pageLockPadding = false, menu = true, scrollWatch = false, headerScroll = false, dynamic = false, mediaQuery = false, scrollLock = false, shouldScrollOffsetHeader = false, shouldSmoothScroll = true, scrollMargin = 0, mainElement = false, mainElementScrollMargin = 0, menuItemActive = "active", menuOpenClass = "menu--open", hideClass = "visually-hidden", menuIconActive = "header__burger--active", on, speed = 350, animationClass = false, headerHeightValue = false} = options;
             const headerElem = document.querySelector(header);
             if (!headerElem) {
                 console.error(`Не найден элемент с селектором "${header}"`);
@@ -4340,10 +4340,10 @@
                     menuBodyElem.classList.toggle(menuOpenClass);
                     if (menuBodyElem.classList.contains(menuOpenClass)) headerMenuOpen(); else headerMenuClose();
                     if (animationClass) {
-                        headerElem.classList.add("transitionStart");
+                        headerElem.classList.add(animationClass);
                         transitionTimeout = setTimeout((() => {
                             clearTimeout(transitionTimeout);
-                            headerElem.classList.remove("transitionStart");
+                            headerElem.classList.remove(animationClass);
                         }), speed);
                     }
                 }
@@ -4491,7 +4491,8 @@
             },
             pageLock: true,
             pageLockPadding: true,
-            pageLockClass: "lock"
+            pageLockClass: "lock",
+            animationClass: "transitionStart"
         });
         const headerElem = document.querySelector(".header");
         const isTouchDevice = "ontouchstart" in window || navigator.msMaxTouchPoints > 0;

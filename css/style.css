@@ -1,3 +1,5 @@
+@charset "UTF-8";
+
 .lock .body {
   overflow: hidden;
   -ms-touch-action: none;
@@ -1072,13 +1074,49 @@ a {
 
 /*====================================================================================================*/
 
-.no-webp .hero {
+.no-webp .hero{
   background: url("../img/main/hero-bg.jpg") center center/cover no-repeat; }
 
 .hero {
   position: relative;
   padding-top: 14.8125rem;
   --bottom-height: 7.5rem;
+}
+
+.hero__loader {
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  -webkit-animation: spin 2s linear infinite;
+          animation: spin 2s linear infinite;
+  display: none;
+  /* Начально скрываем лоадер */
+}
+
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
 }
 
 .hero__container {
@@ -1189,6 +1227,10 @@ a {
   max-width: 100%;
   border-top-right-radius: 0.25rem;
   border-top-left-radius: 0.25rem;
+}
+
+.hero-slider__slide {
+  min-width: 100%;
 }
 
 .hero-slider__media {
@@ -1550,7 +1592,7 @@ a {
 
 /*====================================================================================================*/
 
-.no-webp .featured {
+.no-webp .featured{
   background: url("../img/main/features-bg.jpg") center center/cover no-repeat; }
 
 .featured {
@@ -1816,7 +1858,7 @@ a {
   padding-bottom: calc(var(--button-height) * 2);
 }
 
-.no-webp .newsletter__container {
+.no-webp .newsletter__container{
   background: url("../img/main/newsletter-bg.jpg") center center/cover no-repeat; }
 
 .newsletter__container {
@@ -2014,6 +2056,10 @@ a {
   z-index: 1;
 }
 
+.inspirations__card {
+  height: 100%;
+}
+
 .inspirations__item--long {
   -ms-grid-column-span: 2;
   grid-column: 2 span;
@@ -2152,7 +2198,7 @@ a {
   margin-bottom: 0.5rem;
 }
 
-.inspirations__text {
+.inspirations__card-title {
   font-size: 2rem;
   font-weight: 700;
   line-height: 2.5rem;
@@ -2310,7 +2356,7 @@ a {
 }
 
 @media (max-width: 50em) {
-  .section-title__adapt {
+  .section-title--adapt {
     font-size: 3rem;
     line-height: 4rem;
     max-width: 37.5rem;
@@ -2514,7 +2560,7 @@ a {
 }
 
 @media (max-width: 81.25em) {
-  .inspirations__text {
+  .inspirations__card-title {
     font-size: 1.65rem;
     line-height: 2.2rem;
   }
@@ -2533,7 +2579,7 @@ a {
 }
 
 @media (max-width: 74.6875em) {
-  .inspirations__text {
+  .inspirations__card-title {
     font-size: 1.35rem;
     line-height: 1.9rem;
     margin-bottom: 1.2rem;
@@ -2586,7 +2632,7 @@ a {
     grid-column: 1 span;
   }
 
-  .inspirations__text {
+  .inspirations__card-title {
     font-size: 2rem;
     line-height: 2.5rem;
   }
@@ -2622,7 +2668,7 @@ a {
 }
 
 @media (max-width: 62.5em) {
-  .section-title__adapt {
+  .section-title--adapt {
     font-size: 3.5rem;
     line-height: 4.375rem;
     max-width: 41.6875rem;
@@ -2678,7 +2724,7 @@ a {
     max-height: 3.25rem;
   }
 
-  .inspirations__text {
+  .inspirations__card-title {
     font-size: 1.5625rem;
     line-height: 2.1875rem;
   }
@@ -2702,7 +2748,7 @@ a {
     padding-bottom: 80px;
   }
 
-  .inspirations__text {
+  .inspirations__card-title {
     font-size: 1.25rem;
     line-height: 1.875rem;
     margin-bottom: 0.9375rem;
@@ -2778,7 +2824,7 @@ a {
     max-height: 4rem;
   }
 
-  .inspirations__text {
+  .inspirations__card-title {
     font-size: 1.4375rem;
     line-height: 2rem;
   }
@@ -2789,7 +2835,7 @@ a {
 }
 
 @media (max-width: 37.5em) {
-  .section-title__adapt {
+  .section-title--adapt {
     font-size: 2.5rem;
     line-height: 3.375rem;
     max-width: 31.25rem;
@@ -2933,7 +2979,7 @@ a {
 }
 
 @media (max-width: 28.75em) {
-  .section-title__adapt {
+  .section-title--adapt {
     font-size: 2.125rem;
     line-height: 2.75rem;
     max-width: 25rem;
@@ -2996,7 +3042,7 @@ a {
     max-height: 3.25rem;
   }
 
-  .inspirations__text {
+  .inspirations__card-title {
     font-size: 1.0625rem;
     line-height: 1.5625rem;
     margin-bottom: 0.625rem;
@@ -3008,7 +3054,7 @@ a {
 }
 
 @media (max-width: 22.5em) {
-  .section-title__adapt {
+  .section-title--adapt {
     font-size: 1.75rem;
     line-height: 2.25rem;
     max-width: 18.75rem;
@@ -3154,8 +3200,8 @@ a {
   }
 }
 
-.webp .hero { background: url(../img/main/hero-bg.webp) center center/cover no-repeat; }
+.webp .hero{ background: url(../img/main/hero-bg.webp) center center/cover no-repeat; }
 
-.webp .featured { background: url(../img/main/features-bg.webp) center center/cover no-repeat; }
+.webp .featured{ background: url(../img/main/features-bg.webp) center center/cover no-repeat; }
 
-.webp .newsletter__container { background: url(../img/main/newsletter-bg.webp) center center/cover no-repeat; }
+.webp .newsletter__container{ background: url(../img/main/newsletter-bg.webp) center center/cover no-repeat; }
