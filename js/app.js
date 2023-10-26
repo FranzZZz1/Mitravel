@@ -3913,8 +3913,8 @@
             if (document.querySelector(".hero-slider") && document.querySelector(".controls-slider")) {
                 let isTransitioning = false;
                 const sliderSpeed = 800;
-                const prevButton = document.querySelector(".controls__button-prev");
-                const nextButton = document.querySelector(".controls__button-next");
+                const prevButton = document.querySelector(".controls__button--prev");
+                const nextButton = document.querySelector(".controls__button--next");
                 const swiperText = new swiper_core_Swiper(".controls-slider", {
                     modules: [ Navigation, Autoplay, Controller ],
                     observer: true,
